@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Карта не найдена{% endblock %}
+{% block body %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);text-align:center">
+  <div>
+    <div style="font-size:64px;margin-bottom:16px">🔍</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px">Карта не найдена</div>
+    <div style="font-size:14px;color:var(--text-sec);margin-bottom:28px">Такой карты не существует или она была удалена</div>
+    <a href="/" class="btn-gold" style="padding:13px 28px">← На главную</a>
+  </div>
+</div>
+{% endblock %}

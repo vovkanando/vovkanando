@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет — NFC Визитка{% endblock %}
+{% block body %}
+<div style="min-height:100vh;background:var(--bg)">
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10;background:rgba(9,9,12,.85)">
+    <div class="logo"><div class="logo-mark">N</div><div><div class="logo-text">NFC Визитка</div><div class="logo-sub">Личный кабинет</div></div></div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span style="font-size:12px;color:var(--text-sec)">{{email}}</span>
+      <a href="/logout" class="btn-ghost" style="padding:8px 16px;font-size:12px">Выйти</a>
+    </div>
+  </nav>
+  <div style="max-width:900px;margin:0 auto;padding:40px 24px">
+    <div style="display:grid;grid-template-columns:1fr auto;align-items:start;gap:24px;margin-bottom:36px">
+      <div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;margin-bottom:4px">Привет, <span style="font-weight:600;color:var(--gold)">{{p.get('first_name') or 'друг'}}</span> 👋</div>
+        <div style="font-size:14px;color:var(--text-sec)">Управляй своей визиткой</div>
+      </div>
+      <a href="/setup/{{code}}" class="btn-gold" style="white-space:nowrap">✏️ Редактировать</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sec);margin-bottom:8px">Код карты</div>
+        <div style="font-size:22px;font-weight:600;color:var(--gold);letter-spacing:3px">{{code}}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">уникальный ID</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sec);margin-bottom:8px">Статус</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">Активна ✅</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">визитка работает</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sec);margin-bottom:8px">Тема</div>
+        <div style="font-size:15px;font-weight:600;color:var(--text)">{{p.get('theme','dark')|title}}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">стиль визитки</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sec);margin-bottom:16px">Предпросмотр</div>
+        <div style="display:flex;justify-content:center">
+          <div style="width:200px;background:#0E0E14;border-radius:28px;border:2px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.7);overflow:hidden">
+            <div id="mini-preview" style="max-height:420px;overflow:hidden;border-radius:26px"></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:10px">
+          <a href="/c/{{code}}" target="_blank" class="btn-ghost" style="flex:1;padding:11px;font-size:12px;text-align:center">👁 Открыть</a>
+          <button onclick="copyLink()" class="btn-ghost" style="flex:1;padding:11px;font-size:12px">🔗 Копировать</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-sec);margin-bottom:14px">Данные визитки</div>
+          {% for label,val in [('Имя', (p.get('first_name','') + ' ' + p.get('last_name','')).strip() or '—'),('Должность', p.get('role') or '—'),('Компания', p.get('company') or '—'),('Телефон', p.get('phone') or '—'),('Email', p.get('email') or '—')] %}
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px{% if loop.last %};border:none{% endif %}">
+            <span style="color:var(--text-sec)">{{label}}</span>
+            <span style="color:var(--text);font-weight:500;text-align:right;max-width:55%;word-break:break-all">{{val}}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div style="background:var(--gold-dim);border:1px solid rgba(201,169,110,.2);border-radius:16px;padding:20px">
+          <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:12px">📱 Как записать на NFC карту</div>
+          {% for s in ['Скачай приложение <strong>NFC Tools</strong>','Нажми <strong>Write → Add record → URL</strong>','Вставь ссылку ниже и приложи карту'] %}
+          <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+            <span style="width:18px;height:18px;border-radius:50%;background:rgba(201,169,110,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--gold);flex-shrink:0;margin-top:1px">{{loop.index}}</span>
+            <span style="font-size:12px;color:#AAA;line-height:1.6">{{s|safe}}</span>
+          </div>
+          {% endfor %}
+          <div onclick="copyLink()" style="margin-top:10px;padding:10px 14px;background:rgba(201,169,110,.08);border:1px solid rgba(201,169,110,.2);border-radius:10px;font-size:11px;color:var(--gold);cursor:pointer;word-break:break-all" title="Нажми чтобы скопировать">
+            🔗 {{request.host_url}}c/{{code}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const CARD_DATA = {{ p | tojson }};
+const THEMES = {
+  dark:{bg:'#07070A',orbs:[[38,70,55],[220,60,50],[270,50,45],[185,55,48],[45,65,52]]},
+  ocean:{bg:'#060A14',orbs:[[210,70,50],[190,65,48],[230,55,45],[160,50,45],[45,50,48]]},
+  forest:{bg:'#060B08',orbs:[[140,60,42],[100,55,40],[160,50,38],[45,50,45],[80,45,40]]},
+  wine:{bg:'#100608',orbs:[[340,65,42],[320,55,40],[0,60,38],[45,40,40],[280,45,38]]},
+  slate:{bg:'#0A0A10',orbs:[[250,60,48],[220,55,45],[280,50,42],[200,50,40],[45,45,42]]},
+  smoke:{bg:'#F5F3EF',orbs:[[38,40,75],[220,30,80],[270,25,78],[185,30,76],[45,35,74]]},
+};
+function buildMiniCard(){
+  const p=CARD_DATA,th=THEMES[p.theme||'dark'],isSmoke=p.theme==='smoke';
+  const TC=isSmoke?'#1A1A1A':'#F0EDE8',GC=isSmoke?'#A07840':'#C9A96E',SRF=isSmoke?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.05)',BRD=isSmoke?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.08)',TS=isSmoke?'#666':'#888';
+  const uid='d'+Math.random().toString(36).slice(2);
+  const avatar=p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:${GC}">${((p.first_name||'')[0]||(p.last_name||' ')[0]||'?').toUpperCase()}</span>`;
+  const btns=[];
+  if(p.phone)btns.push({icon:'📞',lbl:'Телефон',val:p.phone});
+  if(p.email)btns.push({icon:'✉️',lbl:'Email',val:p.email.length>18?p.email.substring(0,18)+'...':p.email});
+  if(p.tg)btns.push({icon:'✈️',lbl:'Telegram',val:'@'+p.tg.replace(/.*\//,'')});
+  const btnsHTML=btns.slice(0,3).map(b=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${SRF};border:1px solid ${BRD};border-radius:9px;margin-bottom:5px"><span style="font-size:13px">${b.icon}</span><div><div style="font-size:8px;color:${TS}">${b.lbl}</div><div style="font-size:10px;font-weight:500;color:${TC}">${b.val}</div></div></div>`).join('');
+  return `<div style="position:relative;min-height:420px;background:${th.bg};overflow:hidden;font-family:'DM Sans',sans-serif"><canvas id="${uid}" style="position:absolute;inset:0;width:100%;height:100%"></canvas><div style="position:absolute;inset:-40px;backdrop-filter:blur(80px) saturate(1.5);-webkit-backdrop-filter:blur(80px) saturate(1.5)"></div><div style="position:absolute;inset:0;background:${isSmoke?'rgba(250,248,244,.4)':'rgba(7,7,10,.52)'}"></div><div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:28px 14px 36px"><div style="width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.06);border:1.5px solid rgba(201,169,110,.35);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:12px">${avatar}</div><div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:${TC};text-align:center;line-height:1.1">${p.first_name||''}<br><span style="font-weight:600">${p.last_name||''}</span></div>${p.role?`<div style="font-size:8px;letter-spacing:2px;text-transform:uppercase;color:${GC};margin-top:4px">${p.role}</div>`:''}<div style="width:24px;height:1px;background:linear-gradient(90deg,transparent,${GC},transparent);margin:10px auto 12px"></div><div style="width:100%">${btnsHTML}</div></div></div><script>(function(){const c=document.getElementById('${uid}'),ctx=c.getContext('2d');function r(){c.width=c.offsetWidth;c.height=c.offsetHeight||420}r();const orbs=${JSON.stringify(th.orbs)}.map((o,i)=>({bx:[0.15,0.80,0.50,0.20,0.85][i]||.5,by:[0.20,0.25,0.60,0.78,0.72][i]||.5,h:o[0],s:o[1],l:o[2],a:.45,sp:.00012+i*.00003,ph:i*1.2,r:.55-i*.04}));function draw(ts){const W=c.width,H=c.height,B=Math.min(W,H);ctx.clearRect(0,0,W,H);orbs.forEach(o=>{const t=ts*o.sp+o.ph,ox=(o.bx+Math.sin(t)*.10)*W,oy=(o.by+Math.cos(t*.8)*.10)*H,r=o.r*B,p=1+Math.sin(t*1.3)*.07,g=ctx.createRadialGradient(ox,oy,0,ox,oy,r);g.addColorStop(0,\`hsla(\${o.h},\${o.s}%,\${o.l}%,\${o.a*p})\`);g.addColorStop(.4,\`hsla(\${o.h},\${o.s}%,\${o.l-8}%,\${o.a*p*.5})\`);g.addColorStop(1,\`hsla(\${o.h},\${o.s}%,\${o.l-15}%,0)\`);ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill()});requestAnimationFrame(draw)}requestAnimationFrame(draw)})();<\/script>`;
+}
+document.getElementById('mini-preview').innerHTML=buildMiniCard();
+function copyLink(){navigator.clipboard.writeText(location.origin+'/c/{{code}}').then(()=>showToast('Ссылка скопирована ✓'))}
+</script>
+{% endblock %}

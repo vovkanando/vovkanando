@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Нет карты{% endblock %}
+{% block body %}
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg);text-align:center">
+  <div>
+    <div style="font-size:56px;margin-bottom:16px">📭</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;margin-bottom:8px">Нет привязанной карты</div>
+    <div style="font-size:13px;color:var(--text-sec);margin-bottom:28px">К твоему аккаунту не привязана ни одна карта</div>
+    <a href="/logout" class="btn-ghost">Выйти</a>
+  </div>
+</div>
+{% endblock %}

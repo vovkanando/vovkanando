@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}NFC Визитка{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#09090C;--surface:#111115;--surface2:#18181D;--surface3:#1F1F26;
+  --border:rgba(255,255,255,0.07);--border-focus:rgba(201,169,110,0.45);
+  --text:#EEEAE3;--text-sec:#777;--text-muted:#3A3A44;
+  --gold:#C9A96E;--gold-light:#E8C98A;--gold-dim:rgba(201,169,110,0.10);
+  --green:#2ECC71;--red:#E74C3C;--radius:14px;
+}
+html{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input,select,textarea{font-family:'DM Sans',sans-serif}
+
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1a1200}
+.logo-text{font-size:15px;font-weight:600;color:var(--text)}
+.logo-sub{font-size:10px;color:var(--text-sec)}
+
+.btn-gold{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;background:linear-gradient(135deg,#b8922e,#E8C98A 50%,#C9A96E);background-size:200%;border:none;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#140f00;cursor:pointer;transition:opacity .2s,transform .15s}
+.btn-gold:hover{opacity:.9}
+.btn-gold:active{transform:scale(.97)}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;font-size:13px;font-weight:500;color:var(--text-sec);cursor:pointer;transition:all .2s}
+.btn-ghost:hover{border-color:var(--border-focus);color:var(--text)}
+.btn-green{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;background:linear-gradient(135deg,#1a8a4a,#2ECC71 50%,#1a8a4a);background-size:200%;border:none;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#071a0e;cursor:pointer;transition:opacity .2s,transform .15s}
+.btn-green:hover{opacity:.9}
+.btn-green:active{transform:scale(.97)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:500;letter-spacing:.5px;color:var(--text-sec);margin-bottom:6px;text-transform:uppercase}
+.field input,.field select,.field textarea{width:100%;padding:13px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s,background .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--border-focus);background:var(--surface2)}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-muted)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(20,20,20,.95);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(20px);padding:12px 24px;border-radius:100px;font-size:13px;color:var(--text);opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{border-color:rgba(231,76,60,.4);color:#ff8a80}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+<div class="toast" id="toast"></div>
+<script>
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type?type:'')+ ' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+async function api(url,data){
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  return r.json();
+}
+</script>
+</body>
+</html>

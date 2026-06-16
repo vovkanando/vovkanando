@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Настройка визитки{% endblock %}
+{% block body %}
+<div style="min-height:100vh;display:grid;grid-template-columns:1fr 1fr">
+
+  <!-- FORM -->
+  <div style="padding:40px;overflow-y:auto;border-right:1px solid var(--border);background:var(--bg)">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:36px">
+      <div class="logo"><div class="logo-mark">N</div><div><div class="logo-text">NFC Визитка</div><div class="logo-sub">Настройка</div></div></div>
+      <a href="/logout" style="font-size:12px;color:var(--text-sec)">Выйти</a>
+    </div>
+
+    <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;margin-bottom:6px">Заполни <span style="font-weight:600;color:var(--gold)">визитку</span></div>
+    <div style="font-size:13px;color:var(--text-sec);margin-bottom:32px">Код карты: <span style="color:var(--gold);font-weight:600;letter-spacing:2px">{{code}}</span></div>
+
+    <!-- Photo -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;font-weight:500;letter-spacing:.5px;color:var(--text-sec);text-transform:uppercase;margin-bottom:8px">Фото профиля</div>
+      <div onclick="document.getElementById('photo-inp').click()" style="display:flex;align-items:center;gap:16px;padding:16px;background:var(--surface);border:1px dashed rgba(201,169,110,.25);border-radius:12px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(201,169,110,.25)'">
+        <div id="photo-prev" style="width:64px;height:64px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+          {% if p.get('photo') %}
+          <img src="{{p.photo}}" style="width:100%;height:100%;object-fit:cover">
+          {% else %}
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--gold)" id="photo-initials">?</span>
+          {% endif %}
+        </div>
+        <div style="font-size:13px;color:var(--text-sec)"><strong style="color:var(--text)">Нажми чтобы загрузить</strong><br>JPG или PNG, до 5 МБ</div>
+      </div>
+      <input type="file" id="photo-inp" accept="image/*" onchange="handlePhoto(this)" style="display:none">
+    </div>
+
+    <div class="field-row">
+      <div class="field"><label>Имя *</label><input type="text" id="f-fn" value="{{p.get('first_name','')}}" placeholder="Иван" oninput="updatePreview()"></div>
+      <div class="field"><label>Фамилия *</label><input type="text" id="f-ln" value="{{p.get('last_name','')}}" placeholder="Петров" oninput="updatePreview()"></div>
+    </div>
+    <div class="field"><label>Должность</label><input type="text" id="f-role" value="{{p.get('role','')}}" placeholder="Sales Manager" oninput="updatePreview()"></div>
+    <div class="field"><label>Компания</label><input type="text" id="f-co" value="{{p.get('company','')}}" placeholder="Название компании" oninput="updatePreview()"></div>
+
+    <div style="border-top:1px solid var(--border);margin:24px 0 20px"></div>
+    <div style="font-size:12px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Контакты</div>
+
+    <div class="field"><label>Телефон</label><input type="tel" id="f-ph" value="{{p.get('phone','')}}" placeholder="+375 44 000-00-00" oninput="updatePreview()"></div>
+    <div class="field"><label>Email</label><input type="email" id="f-em" value="{{p.get('email','')}}" placeholder="your@email.com" oninput="updatePreview()"></div>
+
+    <div style="border-top:1px solid var(--border);margin:24px 0 20px"></div>
+    <div style="font-size:12px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Соцсети</div>
+
+    {% for fid,icon,ph,val in [
+      ('f-tg','✈️','t.me/username', p.get('tg','')),
+      ('f-ig','📸','instagram.com/username', p.get('ig','')),
+      ('f-wa','💬','wa.me/375440000000', p.get('wa','')),
+      ('f-vk','🔵','vk.com/username', p.get('vk','')),
+      ('f-li','💼','linkedin.com/in/username', p.get('li','')),
+    ] %}
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">{{icon}}</div>
+      <input type="text" id="{{fid}}" value="{{val}}" placeholder="{{ph}}" oninput="updatePreview()" style="width:100%;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;outline:none">
+    </div>
+    {% endfor %}
+
+    <!-- Theme -->
+    <div style="border-top:1px solid var(--border);margin:24px 0 20px"></div>
+    <div style="font-size:12px;color:var(--text-sec);letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">Тема</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:28px">
+      {% for tid,label,grad in [
+        ('dark','Midnight','#07070A,#111115'),
+        ('ocean','Ocean','#060A14,#0D1A2E'),
+        ('forest','Forest','#060B08,#0B1A0E'),
+        ('wine','Wine','#100608,#1E0A10'),
+        ('slate','Cosmos','#0A0A10,#141420'),
+        ('smoke','Smoke','#FAFAF8,#F0EDE8'),
+      ] %}
+      <div onclick="selectTheme('{{tid}}')" id="th-{{tid}}" style="padding:12px 8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .2s{% if p.get('theme','dark')==tid %};border-color:var(--gold);background:var(--gold-dim){% endif %}">
+        <div style="height:36px;border-radius:6px;background:linear-gradient(135deg,{{grad}});margin-bottom:6px"></div>
+        <div style="font-size:11px;font-weight:500;color:{% if p.get('theme','dark')==tid %}var(--gold){% else %}var(--text-sec){% endif %}" id="th-lbl-{{tid}}">{{label}}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button class="btn-gold" style="width:100%;padding:16px;font-size:14px" onclick="saveProfile()">
+      💾 Сохранить визитку
+    </button>
+    <a href="/dashboard" style="display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--text-sec)">← В личный кабинет</a>
+  </div>
+
+  <!-- PREVIEW -->
+  <div style="position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:#06060A;overflow:hidden">
+    <div style="padding:20px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#3A3A44">Предпросмотр</span>
+      <span style="font-size:11px;color:#3A3A44">📱 iPhone</span>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="width:280px;background:#0E0E14;border-radius:38px;border:2px solid rgba(255,255,255,.10);box-shadow:0 40px 80px rgba(0,0,0,.8);overflow:hidden;position:relative">
+        <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:26px;background:#0E0E14;border-radius:0 0 16px 16px;border:2px solid rgba(255,255,255,.06);border-top:none;z-index:10"></div>
+        <div id="phone-screen" style="max-height:580px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;border-radius:36px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CODE = '{{code}}';
+let currentTheme = '{{p.get("theme","dark")}}';
+let photoData = null;
+
+{% if p.get('photo') %}
+photoData = '{{p.photo}}';
+{% endif %}
+
+const THEMES = {
+  dark:  {bg:'#07070A',orbs:[[38,70,55],[220,60,50],[270,50,45],[185,55,48],[45,65,52]]},
+  ocean: {bg:'#060A14',orbs:[[210,70,50],[190,65,48],[230,55,45],[160,50,45],[45,50,48]]},
+  forest:{bg:'#060B08',orbs:[[140,60,42],[100,55,40],[160,50,38],[45,50,45],[80,45,40]]},
+  wine:  {bg:'#100608',orbs:[[340,65,42],[320,55,40],[0,60,38],[45,40,40],[280,45,38]]},
+  slate: {bg:'#0A0A10',orbs:[[250,60,48],[220,55,45],[280,50,42],[200,50,40],[45,45,42]]},
+  smoke: {bg:'#F5F3EF',orbs:[[38,40,75],[220,30,80],[270,25,78],[185,30,76],[45,35,74]]},
+};
+
+function selectTheme(tid){
+  document.querySelectorAll('[id^="th-"]').forEach(el=>{
+    if(el.id.startsWith('th-') && !el.id.startsWith('th-lbl')){
+      el.style.borderColor='var(--border)';
+      el.style.background='var(--surface)';
+    }
+  });
+  document.querySelectorAll('[id^="th-lbl-"]').forEach(el=>el.style.color='var(--text-sec)');
+  document.getElementById('th-'+tid).style.borderColor='var(--gold)';
+  document.getElementById('th-'+tid).style.background='var(--gold-dim)';
+  document.getElementById('th-lbl-'+tid).style.color='var(--gold)';
+  currentTheme=tid; updatePreview();
+}
+
+function v(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function getInitials(){const f=v('f-fn'),l=v('f-ln');return((f?f[0]:'')+(l?l[0]:'')).toUpperCase()||'?';}
+
+function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    photoData=e.target.result;
+    document.getElementById('photo-prev').innerHTML=`<img src="${photoData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+    updatePreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildCard(){
+  const th=THEMES[currentTheme]||THEMES.dark;
+  const isSmoke=currentTheme==='smoke';
+  const TC=isSmoke?'#1A1A1A':'#F0EDE8';
+  const TS=isSmoke?'#666':'#888';
+  const GC=isSmoke?'#A07840':'#C9A96E';
+  const FC=isSmoke?'#AAA':'#333';
+  const BG=th.bg;
+  const SRF=isSmoke?'rgba(0,0,0,0.05)':'rgba(255,255,255,0.05)';
+  const BRD=isSmoke?'rgba(0,0,0,0.08)':'rgba(255,255,255,0.08)';
+
+  const fn=v('f-fn'),ln=v('f-ln'),role=v('f-role'),co=v('f-co'),ph=v('f-ph'),em=v('f-em'),tg=v('f-tg'),ig=v('f-ig'),wa=v('f-wa'),vk=v('f-vk'),li=v('f-li');
+
+  const avatar=photoData
+    ?`<img src="${photoData}" style="width:100%;height:100%;object-fit:cover;">`
+    :`<span style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:${GC};letter-spacing:2px">${getInitials()}</span>`;
+
+  const btns=[];
+  if(ph)btns.push({icon:'📞',bg:isSmoke?'rgba(52,199,89,0.1)':'rgba(52,199,89,0.12)',lbl:'Телефон',val:ph,href:`tel:${ph.replace(/\s/g,'')}`});
+  if(em)btns.push({icon:'✉️',bg:isSmoke?'rgba(150,100,0,0.1)':'rgba(201,169,110,0.12)',lbl:'Email',val:em,href:`mailto:${em}`});
+  if(tg)btns.push({icon:'✈️',bg:isSmoke?'rgba(38,168,224,0.1)':'rgba(38,168,224,0.12)',lbl:'Telegram',val:'@'+tg.replace(/.*\//,''),href:tg.startsWith('http')?tg:'https://'+tg});
+  if(ig)btns.push({icon:'📸',bg:isSmoke?'rgba(225,48,108,0.1)':'rgba(225,48,108,0.12)',lbl:'Instagram',val:'@'+ig.replace(/.*\//,''),href:ig.startsWith('http')?ig:'https://'+ig});
+  if(wa)btns.push({icon:'💬',bg:isSmoke?'rgba(37,211,102,0.1)':'rgba(37,211,102,0.12)',lbl:'WhatsApp',val:'WhatsApp',href:wa.startsWith('http')?wa:'https://'+wa});
+  if(vk)btns.push({icon:'🔵',bg:isSmoke?'rgba(71,118,196,0.1)':'rgba(71,118,196,0.12)',lbl:'VKontakte',val:'@'+vk.replace(/.*\//,''),href:vk.startsWith('http')?vk:'https://'+vk});
+  if(li)btns.push({icon:'💼',bg:isSmoke?'rgba(10,102,194,0.1)':'rgba(10,102,194,0.12)',lbl:'LinkedIn',val:'LinkedIn',href:li.startsWith('http')?li:'https://'+li});
+
+  const btnsHTML=btns.map(b=>`<a href="${b.href}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:${SRF};border:1px solid ${BRD};border-radius:13px;text-decoration:none;color:${TC};margin-bottom:8px"><div style="width:36px;height:36px;border-radius:9px;background:${b.bg};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${b.icon}</div><div><div style="font-size:9px;color:${TS}">${b.lbl}</div><div style="font-size:12px;font-weight:500;color:${TC}">${b.val}</div></div><span style="margin-left:auto;color:${FC};font-size:15px">›</span></a>`).join('');
+
+  const orbsJS=JSON.stringify(th.orbs);
+  const uid='prev'+Date.now();
+
+  return `<div style="position:relative;min-height:640px;background:${BG};overflow:hidden;font-family:'DM Sans',sans-serif">
+<canvas id="${uid}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+<div style="position:absolute;inset:-40px;backdrop-filter:blur(90px) saturate(1.6);-webkit-backdrop-filter:blur(90px) saturate(1.6)"></div>
+<div style="position:absolute;inset:0;background:${isSmoke?'rgba(250,248,244,.4)':'rgba(7,7,10,.52)'}"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 30%,${isSmoke?'rgba(250,248,244,.6)':'rgba(7,7,10,.65)'} 100%)"></div>
+<div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:40px 18px 56px">
+  <div style="width:82px;height:82px;border-radius:50%;background:rgba(255,255,255,.06);border:1.5px solid rgba(201,169,110,.35);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 0 0 4px rgba(201,169,110,.06),0 8px 24px rgba(0,0,0,.5)">${avatar}</div>
+  <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:${TC};text-align:center;line-height:1.1;margin-bottom:5px">${fn?fn+'<br>':''}<span style="font-weight:600">${ln||''}</span></div>
+  ${role?`<div style="font-size:9px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:${GC};margin-bottom:3px">${role}</div>`:''}
+  ${co?`<div style="font-size:11px;color:${TS};margin-bottom:3px">${co}</div>`:''}
+  <div style="width:32px;height:1px;background:linear-gradient(90deg,transparent,${GC},transparent);margin:14px auto 18px"></div>
+  <div style="width:100%">${btnsHTML}</div>
+  <div style="width:100%;padding:13px;background:linear-gradient(135deg,#b8922e,#E8C98A 50%,#C9A96E);border-radius:13px;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#140f00;text-align:center;margin-top:4px;cursor:pointer">＋ Сохранить контакт</div>
+  ${co?`<div style="margin-top:28px;text-align:center"><div style="width:3px;height:3px;background:${FC};border-radius:50%;margin:0 auto 7px"></div><div style="font-size:9px;color:${FC};letter-spacing:2px;text-transform:uppercase">${co}</div></div>`:''}
+</div>
+</div>
+<script>
+(function(){
+  const c=document.getElementById('${uid}'),ctx=c.getContext('2d');
+  function resize(){c.width=c.offsetWidth;c.height=c.offsetHeight||640}
+  resize(); window.addEventListener('resize',resize);
+  const orbs=${orbsJS}.map((o,i)=>({bx:[0.15,0.80,0.50,0.20,0.85][i]||.5,by:[0.20,0.25,0.60,0.78,0.72][i]||.5,h:o[0],s:o[1],l:o[2],a:.45,sp:.00012+i*.00003,ph:i*1.2,r:.55-i*.04}));
+  let af;
+  function draw(ts){const W=c.width,H=c.height,B=Math.min(W,H);ctx.clearRect(0,0,W,H);orbs.forEach(o=>{const t=ts*o.sp+o.ph,ox=(o.bx+Math.sin(t)*.10)*W,oy=(o.by+Math.cos(t*.8)*.10)*H,r=o.r*B,p=1+Math.sin(t*1.3)*.07,g=ctx.createRadialGradient(ox,oy,0,ox,oy,r);g.addColorStop(0,\`hsla(\${o.h},\${o.s}%,\${o.l}%,\${o.a*p})\`);g.addColorStop(.4,\`hsla(\${o.h},\${o.s}%,\${o.l-8}%,\${o.a*p*.5})\`);g.addColorStop(1,\`hsla(\${o.h},\${o.s}%,\${o.l-15}%,0)\`);ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill()});af=requestAnimationFrame(draw)}
+  af=requestAnimationFrame(draw);
+  // Cleanup old canvases
+  setTimeout(()=>{const canvases=document.querySelectorAll('canvas[id^="prev"]');if(canvases.length>2){canvases[0].getContext('2d').clearRect(0,0,1,1)}},5000);
+})();
+<\/script>`;
+}
+
+function updatePreview(){
+  document.getElementById('phone-screen').innerHTML=buildCard();
+  const initEl=document.getElementById('photo-initials');
+  if(initEl)initEl.textContent=getInitials();
+}
+
+async function saveProfile(){
+  const fn=v('f-fn'),ln=v('f-ln');
+  if(!fn&&!ln){showToast('Заполни имя или фамилию','error');return}
+  const data={
+    first_name:fn, last_name:ln, role:v('f-role'), company:v('f-co'),
+    phone:v('f-ph'), email:v('f-em'),
+    tg:v('f-tg'), ig:v('f-ig'), wa:v('f-wa'), vk:v('f-vk'), li:v('f-li'),
+    theme:currentTheme, photo:photoData||''
+  };
+  const r=await api(`/api/profile/${CODE}`,data);
+  if(r.ok){showToast('✅ Визитка сохранена!');setTimeout(()=>location.href='/dashboard',1200)}
+  else showToast(r.error||'Ошибка сохранения','error');
+}
+
+updatePreview();
+</script>
+{% endblock %}

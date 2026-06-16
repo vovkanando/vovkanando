@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Админ панель — NFC Визитка{% endblock %}
+{% block body %}
+<div style="min-height:100vh;background:var(--bg)">
+
+  <nav style="display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid var(--border);background:rgba(9,9,12,.9);backdrop-filter:blur(20px);position:sticky;top:0;z-index:50">
+    <div class="logo"><div class="logo-mark">N</div><div><div class="logo-text">NFC Визитка</div><div class="logo-sub" style="color:var(--gold)">Администратор</div></div></div>
+    <a href="/logout" class="btn-ghost" style="padding:8px 16px;font-size:12px">Выйти</a>
+  </nav>
+
+  <div style="max-width:1100px;margin:0 auto;padding:36px 24px">
+
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:36px">
+      {% for label,val,color in [('Всего карт',total,'var(--gold)'),('Активировано',active,'#2ECC71'),('Не активировано',inactive,'#E74C3C')] %}
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">{{label}}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:300;color:{{color}}">{{val}}</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Generate codes -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:28px">
+      <div style="font-size:14px;font-weight:500;margin-bottom:16px">Сгенерировать коды для новых карт</div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <input type="number" id="gen-count" value="10" min="1" max="100" style="width:80px;padding:11px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none">
+        <button class="btn-gold" onclick="generateCodes()" style="padding:11px 24px">⚡ Генерировать</button>
+        <span style="font-size:12px;color:var(--text-sec)">Получишь коды — распечатай и вложи в карты</span>
+      </div>
+      <div id="gen-result" style="margin-top:16px;display:none">
+        <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px">Новые коды:</div>
+        <div id="gen-codes" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+        <button onclick="copyAllCodes()" class="btn-ghost" style="margin-top:12px;padding:9px 16px;font-size:12px">📋 Скопировать все</button>
+      </div>
+    </div>
+
+    <!-- Cards table -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden">
+      <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:14px;font-weight:500">Все карты</div>
+        <input type="text" id="search" placeholder="Поиск по коду, email, имени..." oninput="filterCards()" style="padding:8px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none;width:280px">
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse" id="cards-table">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border)">
+              {% for h in ['Код','Статус','Email','Имя','Компания','Создана','Действия'] %}
+              <th style="padding:12px 16px;font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted);text-align:left">{{h}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody id="cards-body">
+            {% for c in cards %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background='transparent'" data-search="{{c.code}} {{c.email or ''}} {{c.first_name or ''}} {{c.last_name or ''}} {{c.company or ''}}">
+              <td style="padding:14px 16px">
+                <a href="/c/{{c.code}}" target="_blank" style="font-family:monospace;font-size:14px;font-weight:600;letter-spacing:2px;color:var(--gold)">{{c.code}}</a>
+              </td>
+              <td style="padding:14px 16px">
+                {% if c.activated %}
+                <span style="padding:4px 10px;border-radius:100px;font-size:11px;font-weight:500;background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.3);color:#2ECC71">✓ Активна</span>
+                {% else %}
+                <span style="padding:4px 10px;border-radius:100px;font-size:11px;font-weight:500;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);color:#E74C3C">○ Новая</span>
+                {% endif %}
+              </td>
+              <td style="padding:14px 16px;font-size:13px;color:var(--text-sec)">{{c.email or '—'}}</td>
+              <td style="padding:14px 16px;font-size:13px">{{((c.first_name or '')+ ' ' +(c.last_name or '')).strip() or '—'}}</td>
+              <td style="padding:14px 16px;font-size:13px;color:var(--text-sec)">{{c.company or '—'}}</td>
+              <td style="padding:14px 16px;font-size:12px;color:var(--text-muted)">{{c.created_at[:10] if c.created_at else '—'}}</td>
+              <td style="padding:14px 16px">
+                <div style="display:flex;gap:6px">
+                  {% if c.activated %}
+                  <a href="/setup/{{c.code}}" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-sec)">✏️</a>
+                  <a href="/c/{{c.code}}" target="_blank" style="padding:5px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-sec)">👁</a>
+                  {% endif %}
+                  <button onclick="deleteCard('{{c.code}}')" style="padding:5px 10px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.25);border-radius:6px;font-size:11px;color:#E74C3C;cursor:pointer">🗑</button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let generatedCodes = [];
+
+async function generateCodes(){
+  const count = parseInt(document.getElementById('gen-count').value)||1;
+  const r = await api('/api/admin/generate',{count});
+  if(!r.ok){showToast(r.error||'Ошибка','error');return}
+  generatedCodes = r.codes;
+  const box = document.getElementById('gen-codes');
+  box.innerHTML = r.codes.map(c=>`<span style="padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:monospace;font-size:14px;font-weight:600;letter-spacing:2px;color:var(--gold)">${c}</span>`).join('');
+  document.getElementById('gen-result').style.display='block';
+  showToast(`Сгенерировано ${r.codes.length} кодов ✓`);
+  setTimeout(()=>location.reload(),3000);
+}
+
+function copyAllCodes(){
+  navigator.clipboard.writeText(generatedCodes.join('\n')).then(()=>showToast('Коды скопированы ✓'));
+}
+
+async function deleteCard(code){
+  if(!confirm(`Удалить карту ${code}? Все данные будут удалены.`)) return;
+  const r = await fetch(`/api/admin/delete/${code}`,{method:'DELETE'});
+  const data = await r.json();
+  if(data.ok){showToast('Карта удалена');setTimeout(()=>location.reload(),1000)}
+  else showToast('Ошибка','error');
+}
+
+function filterCards(){
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#cards-body tr').forEach(row=>{
+    const text = row.getAttribute('data-search')||'';
+    row.style.display = text.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}
