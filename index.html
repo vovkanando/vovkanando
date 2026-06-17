@@ -1,116 +1,120 @@
-{% extends "base.html" %}
-{% block title %}NFC Визитка — Умные визитки нового поколения{% endblock %}
-{% block body %}
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"><title>Владимир Багучунус</title><link rel="preconnect" href="https://fonts.googleapis.com">
+       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"></head><body style="margin:0;padding:0;background:#07070A;">
+<div style="position:relative;min-height:100vh;background:#07070A;overflow:hidden;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;">
 
-<!-- BG -->
-<div style="position:fixed;inset:0;z-index:0;background:#07070A;overflow:hidden">
-  <canvas id="bgc" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-  <div style="position:absolute;inset:-40px;backdrop-filter:blur(90px) saturate(1.5);-webkit-backdrop-filter:blur(90px) saturate(1.5)"></div>
-  <div style="position:absolute;inset:0;background:rgba(7,7,10,.6)"></div>
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,transparent 20%,rgba(7,7,10,.75) 100%)"></div>
-</div>
+  <!-- BG CANVAS -->
+  <canvas id="bgc" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
+  <div style="position:absolute;inset:-40px;backdrop-filter:blur(90px) saturate(1.6);-webkit-backdrop-filter:blur(90px) saturate(1.6);"></div>
+  <div style="position:absolute;inset:0;background:rgba(7,7,10,0.52);"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 30%,rgba(7,7,10,0.65) 100%);"></div>
 
-<div style="position:relative;z-index:1;min-height:100vh">
+  <!-- CONTENT -->
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:44px 20px 60px;max-width:420px;margin:0 auto;">
 
-  <!-- NAV -->
-  <nav style="display:flex;align-items:center;justify-content:space-between;padding:24px 40px;border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:blur(20px)">
-    <div class="logo">
-      <div class="logo-mark">N</div>
-      <div><div class="logo-text">NFC Визитка</div><div class="logo-sub">Платформа</div></div>
+    <!-- AVATAR -->
+    <div style="width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(201,169,110,0.35);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 0 0 4px rgba(201,169,110,0.06),0 8px 24px rgba(0,0,0,0.5);"><span style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:#C9A96E;letter-spacing:2px;">ВБ</span></div>
+
+    <!-- NAME -->
+    <div style="font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:300;color:#F0EDE8;text-align:center;line-height:1.1;margin-bottom:6px;">
+      Владимир<br><span style="font-weight:600;">Багучунус</span>
     </div>
-    <div style="display:flex;gap:12px">
-      <a href="/login" class="btn-ghost" style="padding:10px 20px">Войти</a>
-    </div>
-  </nav>
+    <div style="font-size:10px;font-weight:500;letter-spacing:3px;text-transform:uppercase;color:#C9A96E;margin-bottom:4px;">Sales manager</div>
+    <div style="font-size:12px;color:#888;margin-bottom:4px;">DevsGroup</div>
+    <div style="width:36px;height:1px;background:linear-gradient(90deg,transparent,#C9A96E,transparent);margin:16px auto 20px;"></div>
 
-  <!-- HERO -->
-  <section style="text-align:center;padding:100px 24px 80px;max-width:700px;margin:0 auto">
-    <div style="display:inline-block;padding:6px 16px;background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.25);border-radius:100px;font-size:11px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:28px">Умные NFC визитки</div>
-    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(42px,8vw,80px);font-weight:300;line-height:1.05;color:#EEEAE3;margin-bottom:20px">Одно касание —<br><span style="font-weight:600;color:var(--gold)">вся информация</span></h1>
-    <p style="font-size:16px;color:#777;line-height:1.7;margin-bottom:40px">Премиальная NFC визитка с личной страницей.<br>Никаких приложений — просто приложи телефон.</p>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-      <a href="#how" class="btn-gold" style="padding:16px 32px;font-size:14px">Как это работает</a>
-      <a href="/login" class="btn-ghost" style="padding:16px 24px">У меня есть карта →</a>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section id="how" style="padding:80px 24px;max-width:900px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:56px">
-      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Процесс</div>
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--text)">Как это работает</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px">
-      {% for step in [
-        ('01','📦','Получаешь карту','Заказываешь карту — получаешь её с уникальным QR кодом активации'),
-        ('02','✏️','Заполняешь данные','Переходишь по ссылке, заполняешь имя, должность, контакты, загружаешь фото'),
-        ('03','🎨','Выбираешь стиль','Выбираешь тему оформления своей визитки из нескольких вариантов'),
-        ('04','📱','Готово!','Теперь любой, кто приложит телефон к карте, увидит твою красивую визитку'),
-      ] %}
-      <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px;position:relative">
-        <div style="font-size:11px;font-weight:600;color:rgba(201,169,110,.4);letter-spacing:2px;margin-bottom:12px">{{step[0]}}</div>
-        <div style="font-size:28px;margin-bottom:12px">{{step[1]}}</div>
-        <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:8px">{{step[2]}}</div>
-        <div style="font-size:13px;color:#666;line-height:1.6">{{step[3]}}</div>
+    <!-- BUTTONS -->
+    <div style="width:100%;">
+    <a href="tel:+375447548955" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:13px 15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;text-decoration:none;color:#F0EDE8;margin-bottom:9px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(52,199,89,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);">📞</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:10px;color:#888;letter-spacing:0.3px;">Телефон</span>
+        <span style="font-size:13px;font-weight:500;color:#F0EDE8;">+375447548955</span>
       </div>
-      {% endfor %}
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section style="padding:40px 24px 80px;max-width:900px;margin:0 auto">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
-      {% for f in [
-        ('✅','Работает без приложения','На Android и iOS — просто прикоснись телефоном'),
-        ('✏️','Редактируй в любое время','Зашёл в кабинет — поменял номер, фото, соцсети'),
-        ('🎨','6 тем оформления','Выбери стиль под свой характер'),
-        ('💾','Сохранение контакта','Посетитель нажимает одну кнопку — ты в его телефоне'),
-        ('🔒','Только ты редактируешь','Доступ к визитке только по паролю'),
-        ('⚡','Мгновенно загружается','Лёгкая страница — открывается за секунду'),
-      ] %}
-      <div style="display:flex;gap:14px;align-items:flex-start;padding:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px">
-        <span style="font-size:22px;flex-shrink:0">{{f[0]}}</span>
-        <div>
-          <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:4px">{{f[1]}}</div>
-          <div style="font-size:12px;color:#666;line-height:1.5">{{f[2]}}</div>
-        </div>
+      <span style="margin-left:auto;color:#333;font-size:16px;">›</span>
+    </a>
+  
+    <a href="mailto:baguchunuswork@gmail" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:13px 15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;text-decoration:none;color:#F0EDE8;margin-bottom:9px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(201,169,110,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);">✉️</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:10px;color:#888;letter-spacing:0.3px;">Email</span>
+        <span style="font-size:13px;font-weight:500;color:#F0EDE8;">baguchunuswork@gmail</span>
       </div>
-      {% endfor %}
-    </div>
-  </section>
+      <span style="margin-left:auto;color:#333;font-size:16px;">›</span>
+    </a>
+  
+    <a href="https://t.me/vovkanando" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:13px 15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;text-decoration:none;color:#F0EDE8;margin-bottom:9px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(38,168,224,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);">✈️</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:10px;color:#888;letter-spacing:0.3px;">Telegram</span>
+        <span style="font-size:13px;font-weight:500;color:#F0EDE8;">@vovkanando</span>
+      </div>
+      <span style="margin-left:auto;color:#333;font-size:16px;">›</span>
+    </a>
+  
+    <a href="https://instagram.com/vovkanando" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;padding:13px 15px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:14px;text-decoration:none;color:#F0EDE8;margin-bottom:9px;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(225,48,108,0.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid rgba(255,255,255,0.06);">📸</div>
+      <div style="display:flex;flex-direction:column;gap:1px;">
+        <span style="font-size:10px;color:#888;letter-spacing:0.3px;">Instagram</span>
+        <span style="font-size:13px;font-weight:500;color:#F0EDE8;">@vovkanando</span>
+      </div>
+      <span style="margin-left:auto;color:#333;font-size:16px;">›</span>
+    </a>
+  </div>
 
-  <!-- FOOTER -->
-  <footer style="border-top:1px solid rgba(255,255,255,.06);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
-    <div class="logo">
-      <div class="logo-mark">N</div>
-      <div class="logo-text">NFC Визитка</div>
-    </div>
-    <div style="font-size:12px;color:#444">Умные визитки нового поколения</div>
-  </footer>
+    <!-- SAVE -->
+    <button onclick="saveContact()" style="width:100%;padding:15px;background:linear-gradient(135deg,#b8922e,#E8C98A 50%,#C9A96E);border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#140f00;cursor:pointer;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(201,169,110,0.2);">
+      ＋ Сохранить контакт
+    </button>
 
+    <!-- FOOTER -->
+    <div style="margin-top:36px;text-align:center;"><div style="width:4px;height:4px;background:#333;border-radius:50%;margin:0 auto 8px;"></div><div style="font-size:10px;color:#333;letter-spacing:2px;text-transform:uppercase;">DevsGroup</div></div>
+  </div>
 </div>
 
 <script>
+
+    function saveContact(){
+      const v = decodeURIComponent(escape(atob('QkVHSU46VkNBUkQNClZFUlNJT046My4wDQpGTjrQktC70LDQtNC40LzQuNGAINCR0LDQs9GD0YfRg9C90YPRgQ0KTjrQkdCw0LPRg9GH0YPQvdGD0YE70JLQu9Cw0LTQuNC80LjRgDs7Ow0KVElUTEU6U2FsZXMgbWFuYWdlcg0KT1JHOkRldnNHcm91cA0KVEVMO1RZUEU9Q0VMTDorMzc1NDQ3NTQ4OTU1DQpFTUFJTDpiYWd1Y2h1bnVzd29ya0BnbWFpbA0KVVJMO3R5cGU9VGVsZWdyYW06aHR0cHM6Ly90Lm1lL3ZvdmthbmFuZG8NCkVORDpWQ0FSRA==')));
+      const b = new Blob([v],{type:'text/vcard;charset=utf-8'});
+      const u = URL.createObjectURL(b);
+      const a = document.createElement('a');
+      a.href=u; a.download='Владимир_Багучунус.vcf';
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(u);
+    }
+  
 (function(){
-  const c=document.getElementById('bgc'),ctx=c.getContext('2d');
-  function resize(){c.width=window.innerWidth;c.height=window.innerHeight}
-  resize(); window.addEventListener('resize',resize);
-  const orbs=[[0.15,0.2,38,70],[0.82,0.15,220,60],[0.5,0.6,270,50],[0.1,0.8,185,55],[0.88,0.75,45,65]];
+  const canvas = document.getElementById('bgc');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight||640; }
+  resize();
+  window.addEventListener('resize', resize);
+  const orbs = [[38,70,55],[220,60,50],[270,50,45],[185,55,48],[45,65,52]].map((o,i) => ({
+    bx: [0.15,0.80,0.50,0.20,0.85][i]||0.5,
+    by: [0.20,0.25,0.60,0.78,0.72][i]||0.5,
+    h:o[0], s:o[1], l:o[2], a:0.45,
+    sp:0.00012+i*0.00003, ph:i*1.2, r:0.55-i*0.04
+  }));
   function draw(ts){
-    const W=c.width,H=c.height,B=Math.min(W,H);
+    const W=canvas.width, H=canvas.height, base=Math.min(W,H);
     ctx.clearRect(0,0,W,H);
-    orbs.forEach(([bx,by,h,s],i)=>{
-      const t=ts*.00014+i*1.3;
-      const ox=(bx+Math.sin(t)*.09)*W,oy=(by+Math.cos(t*.8)*.09)*H,r=.5*B;
+    orbs.forEach(o=>{
+      const t=ts*o.sp+o.ph;
+      const ox=(o.bx+Math.sin(t)*0.10+Math.cos(t*0.6)*0.04)*W;
+      const oy=(o.by+Math.cos(t*0.8)*0.10+Math.sin(t*0.5)*0.04)*H;
+      const r=o.r*base;
+      const pulse=1+Math.sin(t*1.3)*0.07;
       const g=ctx.createRadialGradient(ox,oy,0,ox,oy,r);
-      g.addColorStop(0,`hsla(${h},${s}%,55%,.38)`);
-      g.addColorStop(.5,`hsla(${h},${s}%,45%,.15)`);
-      g.addColorStop(1,`hsla(${h},${s}%,40%,0)`);
-      ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      g.addColorStop(0,`hsla(${o.h},${o.s}%,${o.l}%,${o.a*pulse})`);
+      g.addColorStop(0.4,`hsla(${o.h},${o.s}%,${o.l-8}%,${o.a*pulse*0.5})`);
+      g.addColorStop(1,`hsla(${o.h},${o.s}%,${o.l-15}%,0)`);
+      ctx.beginPath(); ctx.arc(ox,oy,r,0,Math.PI*2);
+      ctx.fillStyle=g; ctx.fill();
     });
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
 })();
 </script>
-{% endblock %}
+</body></html>
